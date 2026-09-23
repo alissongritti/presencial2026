@@ -9,40 +9,73 @@
     body { background: #121214; color: #e1e1e6; margin: 0; padding: 16px; display: flex; justify-content: center; }
     .container { width: 100%; max-width: 540px; }
     h1 { text-align: center; color: #ffb703; font-size: 1.5rem; margin-bottom: 4px; letter-spacing: 1px; }
-    p.sub { text-align: center; font-size: 0.85rem; color: #a8a8b3; margin-bottom: 20px; }
+    p.sub { text-align: center; font-size: 0.85rem; color: #a8a8b3; margin-bottom: 16px; }
     
-    .input-group { background: #202024; border: 1px solid #323238; border-radius: 8px; padding: 16px; margin-bottom: 20px; }
+    .input-group { background: #202024; border: 1px solid #323238; border-radius: 8px; padding: 14px; margin-bottom: 16px; }
     label { display: block; font-size: 0.85rem; margin-bottom: 8px; font-weight: 700; color: #ffb703; letter-spacing: 0.5px; }
     select {
       width: 100%; padding: 12px; border-radius: 6px; border: 1px solid #323238;
       background: #121214; color: #fff; font-size: 1rem; font-weight: bold; cursor: pointer; outline: none;
     }
 
-    .progress { text-align: center; margin: 15px 0; font-size: 0.95rem; font-weight: 600; color: #04d361; }
+    /* Painel de contagem dos Tiers */
+    .tier-counters {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 6px;
+      margin-bottom: 16px;
+      position: sticky;
+      top: 8px;
+      z-index: 10;
+      background: #121214;
+      padding: 6px 0;
+    }
+    .counter-box {
+      background: #202024;
+      border: 1px solid #323238;
+      border-radius: 6px;
+      text-align: center;
+      padding: 6px 2px;
+      font-size: 0.75rem;
+      font-weight: bold;
+    }
+    .counter-box.full { border-color: #04d361; }
+    .counter-box .c-t1 { color: #ffd700; }
+    .counter-box .c-t2 { color: #ff7b00; }
+    .counter-box .c-t3 { color: #04d361; }
+    .counter-box .c-t4 { color: #00a8ff; }
+    .counter-box .c-t5 { color: #a55eea; }
+
+    .progress { text-align: center; margin-bottom: 12px; font-size: 0.9rem; font-weight: 600; color: #a8a8b3; }
     
     .player-card {
       background: #202024; border: 1px solid #323238; border-radius: 8px;
-      padding: 12px 16px; margin-bottom: 10px; display: flex;
+      padding: 10px 14px; margin-bottom: 8px; display: flex;
       justify-content: space-between; align-items: center;
     }
-    .player-name { font-weight: bold; font-size: 1rem; color: #f5f5f7; }
+    .player-name { font-weight: bold; font-size: 0.95rem; color: #f5f5f7; }
     
-    .tier-buttons { display: flex; gap: 6px; }
+    .tier-buttons { display: flex; gap: 5px; }
     .btn-tier {
-      width: 36px; height: 36px; border-radius: 6px; border: 1px solid #3a3a40;
-      background: #29292e; color: #e1e1e6; font-weight: bold; font-size: 0.9rem; cursor: pointer;
+      width: 34px; height: 34px; border-radius: 6px; border: 1px solid #3a3a40;
+      background: #29292e; color: #e1e1e6; font-weight: bold; font-size: 0.85rem; cursor: pointer;
       transition: all 0.15s ease;
     }
+    .btn-tier:disabled {
+      opacity: 0.25;
+      cursor: not-allowed;
+      border-color: #222;
+    }
     
-    .btn-tier.active[data-t="1"] { background: #ffd700; color: #000; border-color: #ffd700; }
-    .btn-tier.active[data-t="2"] { background: #ff7b00; color: #000; border-color: #ff7b00; }
-    .btn-tier.active[data-t="3"] { background: #04d361; color: #000; border-color: #04d361; }
-    .btn-tier.active[data-t="4"] { background: #00a8ff; color: #000; border-color: #00a8ff; }
-    .btn-tier.active[data-t="5"] { background: #a55eea; color: #fff; border-color: #a55eea; }
+    .btn-tier.active[data-t="1"] { background: #ffd700; color: #000; border-color: #ffd700; opacity: 1; }
+    .btn-tier.active[data-t="2"] { background: #ff7b00; color: #000; border-color: #ff7b00; opacity: 1; }
+    .btn-tier.active[data-t="3"] { background: #04d361; color: #000; border-color: #04d361; opacity: 1; }
+    .btn-tier.active[data-t="4"] { background: #00a8ff; color: #000; border-color: #00a8ff; opacity: 1; }
+    .btn-tier.active[data-t="5"] { background: #a55eea; color: #fff; border-color: #a55eea; opacity: 1; }
 
     .btn-submit {
-      width: 100%; padding: 16px; background: #04d361; border: none;
-      border-radius: 8px; color: #000; font-size: 1.05rem; font-weight: 800;
+      width: 100%; padding: 15px; background: #04d361; border: none;
+      border-radius: 8px; color: #000; font-size: 1rem; font-weight: 800;
       cursor: pointer; margin-top: 18px; margin-bottom: 40px; letter-spacing: 0.5px;
     }
     .btn-submit:disabled { background: #323238; color: #7c7c8a; cursor: not-allowed; }
@@ -51,13 +84,22 @@
 <body>
   <div class="container">
     <h1>CS TIER LIST</h1>
-    <p class="sub">Selecione quem você é e classifique os 30 jogadores nos Tiers (1 a 5).</p>
+    <p class="sub">Distribua os 30 jogadores igualmente: 6 em cada Tier.</p>
 
     <div class="input-group">
       <label for="select-votante">QUEM ESTÁ VOTANDO?</label>
       <select id="select-votante">
         <option value="">-- Toque para escolher seu Nick --</option>
       </select>
+    </div>
+
+    <!-- Contadores Dinâmicos -->
+    <div class="tier-counters">
+      <div class="counter-box" id="box-t1"><span class="c-t1">T1</span>: <span id="count-1">0</span>/6</div>
+      <div class="counter-box" id="box-t2"><span class="c-t2">T2</span>: <span id="count-2">0</span>/6</div>
+      <div class="counter-box" id="box-t3"><span class="c-t3">T3</span>: <span id="count-3">0</span>/6</div>
+      <div class="counter-box" id="box-t4"><span class="c-t4">T4</span>: <span id="count-4">0</span>/6</div>
+      <div class="counter-box" id="box-t5"><span class="c-t5">T5</span>: <span id="count-5">0</span>/6</div>
     </div>
 
     <div class="progress" id="progresso">Classificados: 0 / 30</div>
@@ -67,16 +109,20 @@
   </div>
 
   <script>
+    // 30 Jogadores organizados estritamente em ORDEM ALFABÉTICA
     const PLAYERS = [
-      "EKZ", "Leodemetrio", "high", "Comar", "Meztre", "Vitão",
-      "Drox", "Português", "Eufrasin", "norT", "PvL", "Saitama",
-      "Sonzera", "d0g", "Lost", "Perna", "Thigueiras", "Cauãzin",
-      "Brinco", "Soneca", "Pitas", "Dil", "Lucão", "Lusca",
-      "pedr1n", "Hideki", "Spina", "Chriss", "Lanza", "Duro"
+      "Brinco", "Cauãzin", "Chriss", "Comar", "d0g",
+      "Dil", "Drox", "Duro", "EKZ", "Eufrasin",
+      "Hideki", "high", "Lanza", "Leodemetrio", "Lost",
+      "Lucão", "Lusca", "Meztre", "norT", "pedr1n",
+      "Perna", "Pitas", "Português", "PvL", "Saitama",
+      "Soneca", "Sonzera", "Spina", "Thigueiras", "Vitão"
     ];
 
-    const votos = {};
+    const LIMITE_POR_TIER = 6;
+    const votos = {}; // Formato: { "Nick": tierNumber }
 
+    // Preenche o seletor de votante em ordem alfabética
     const selectVotante = document.getElementById("select-votante");
     PLAYERS.forEach(p => {
       const opt = document.createElement("option");
@@ -100,14 +146,55 @@
     }
 
     function selecionar(player, tier) {
-      votos[player] = tier;
-      document.querySelectorAll(`button[data-p="${player}"]`).forEach(btn => {
-        btn.classList.toggle("active", parseInt(btn.dataset.t) === tier);
-      });
-      atualizarProgresso();
+      // Se clicar no mesmo tier já ativo, desmarca
+      if (votos[player] === tier) {
+        delete votos[player];
+      } else {
+        // Checa se o tier alvo já está cheio antes de marcar
+        const contagemAtual = Object.values(votos).filter(t => t === tier).length;
+        if (contagemAtual >= LIMITE_POR_TIER) {
+          alert(`O TIER ${tier} já atingiu o limite de ${LIMITE_POR_TIER} jogadores!`);
+          return;
+        }
+        votos[player] = tier;
+      }
+
+      atualizarInterface();
     }
 
-    function atualizarProgresso() {
+    function atualizarInterface() {
+      const contagens = { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 };
+      
+      // Conta os votos por tier
+      Object.values(votos).forEach(t => contagens[t]++);
+
+      // Atualiza contadores do topo
+      for (let t = 1; t <= 5; t++) {
+        const span = document.getElementById(`count-${t}`);
+        const box = document.getElementById(`box-t${t}`);
+        span.innerText = contagens[t];
+        box.classList.toggle("full", contagens[t] === LIMITE_POR_TIER);
+      }
+
+      // Atualiza estado de cada botão
+      PLAYERS.forEach(player => {
+        const tierSelecionado = votos[player];
+        
+        document.querySelectorAll(`button[data-p="${player}"]`).forEach(btn => {
+          const t = parseInt(btn.dataset.t);
+          const isAtivo = (t === tierSelecionado);
+          
+          btn.classList.toggle("active", isAtivo);
+
+          // Desabilita botões dos Tiers que já lotaram (exceto se for a opção já marcada do próprio card)
+          if (!isAtivo && contagens[t] >= LIMITE_POR_TIER) {
+            btn.disabled = true;
+          } else {
+            btn.disabled = false;
+          }
+        });
+      });
+
       const totalPreenchido = Object.keys(votos).length;
       document.getElementById("progresso").innerText = `Classificados: ${totalPreenchido} / ${PLAYERS.length}`;
     }
@@ -115,14 +202,14 @@
     async function enviarVotos() {
       const votante = selectVotante.value;
       if (!votante) {
-        alert("Selecione o seu nick na lista antes de enviar!");
+        alert("Por favor, selecione seu Nick no topo da página!");
         selectVotante.focus();
         return;
       }
 
       const totalPreenchido = Object.keys(votos).length;
       if (totalPreenchido < PLAYERS.length) {
-        alert(`Ainda faltam jogadores para classificar! (${totalPreenchido}/${PLAYERS.length})`);
+        alert(`Todos os 30 jogadores devem ser classificados! Faltam: ${PLAYERS.length - totalPreenchido}`);
         return;
       }
 
@@ -148,7 +235,7 @@
         });
 
         alert(`✅ Votação de ${votante} enviada com sucesso!`);
-        btn.innerText = "Votos Gravados com Sucesso!";
+        btn.innerText = "Votos Gravados!";
       } catch (err) {
         alert("Erro na conexão. Copie os dados e envie no WhatsApp.");
         prompt("Copie este texto:", JSON.stringify({ votante, votos }));
@@ -158,6 +245,7 @@
     }
 
     renderizarJogadores();
+    atualizarInterface();
   </script>
 </body>
 </html>
