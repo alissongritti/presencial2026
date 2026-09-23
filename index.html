@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Votação Tiers - Campeonato CS2</title>
+  <style>
+    * { box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+    body { background: #121214; color: #e1e1e6; margin: 0; padding: 16px; display: flex; justify-content: center; }
+    .container { width: 100%; max-width: 540px; }
+    h1 { text-align: center; color: #ffb703; font-size: 1.5rem; margin-bottom: 4px; letter-spacing: 1px; }
+    p.sub { text-align: center; font-size: 0.85rem; color: #a8a8b3; margin-bottom: 20px; }
+    
+    .input-group { background: #202024; border: 1px solid #323238; border-radius: 8px; padding: 16px; margin-bottom: 20px; }
+    label { display: block; font-size: 0.85rem; margin-bottom: 8px; font-weight: 700; color: #ffb703; letter-spacing: 0.5px; }
+    select {
+      width: 100%; padding: 12px; border-radius: 6px; border: 1px solid #323238;
+      background: #121214; color: #fff; font-size: 1rem; font-weight: bold; cursor: pointer; outline: none;
+    }
+
+    .progress { text-align: center; margin: 15px 0; font-size: 0.95rem; font-weight: 600; color: #04d361; }
+    
+    .player-card {
+      background: #202024; border: 1px solid #323238; border-radius: 8px;
+      padding: 12px 16px; margin-bottom: 10px; display: flex;
+      justify-content: space-between; align-items: center;
+    }
+    .player-name { font-weight: bold; font-size: 1rem; color: #f5f5f7; }
+    
+    .tier-buttons { display: flex; gap: 6px; }
+    .btn-tier {
+      width: 36px; height: 36px; border-radius: 6px; border: 1px solid #3a3a40;
+      background: #29292e; color: #e1e1e6; font-weight: bold; font-size: 0.9rem; cursor: pointer;
+      transition: all 0.15s ease;
+    }
+    
+    /* Cores dos Tiers idênticas ao modelo */
+    .btn-tier.active[data-t="1"] { background: #ffd700; color: #000; border-color: #ffd700; }
+    .btn-tier.active[data-t="2"] { background: #ff7b00; color: #000; border-color: #ff7b00; }
+    .btn-tier.active[data-t="3"] { background: #04d361; color: #000; border-color: #04d361; }
+    .btn-tier.active[data-t="4"] { background: #00a8ff; color: #000; border-color: #00a8ff; }
+    .btn-tier.active[data-t="5"] { background: #a55eea; color: #fff; border-color: #a55eea; }
+
+    .btn-submit {
+      width: 100%; padding: 16px; background: #04d361; border: none;
+      border-radius: 8px; color: #000; font-size: 1.05rem; font-weight: 800;
+      cursor: pointer; margin-top: 18px; margin-bottom: 40px; letter-spacing: 0.5px;
+    }
+    .btn-submit:disabled { background: #323238; color: #7c7c8a; cursor: not-allowed; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>CS TIER LIST</h1>
+    <p class="sub">Selecione quem você é e classifique os 30 jogadores nos Tiers (1 a 5).</p>
+
+    <div class="input-group">
+      <label for="select-votante">QUEM ESTÁ VOTANDO?</label>
+      <select id="select-votante">
+        <option value="">-- Toque para escolher seu Nick --</option>
+      </select>
+    </div>
+
+    <div class="progress" id="progresso">Classificados: 0 / 30</div>
+    <div id="lista-jogadores"></div>
+
+    <button class="btn-submit" id="btnSalvar" onclick="enviarVotos()">ENVIAR VOTAÇÃO</button>
+  </div>
+
+  <script>
+    // 30 Nicks organizados a partir da grelha oficial
+    const PLAYERS = [
+      "EKZ", "Leodemetrio", "high", "Comar", "Meztre", "Vitão",
+      "Drox", "Português", "Eufrasin", "norT", "PvL", "Saitama",
+      "Sonzera", "d0g", "Lost", "Perna", "Thigueiras", "Cauãzin",
+      "Brinco", "Soneca", "Pitas", "Dil", "Lucão", "Lusca",
+      "pedr1n", "Hideki", "Spina", "Chriss", "Lanza", "Duro"
+    ];
+
+    const votos = {};
+
+    // 1. Preenche o select do votante
+    const selectVotante = document.getElementById("select-votante");
+    PLAYERS.forEach(p => {
+      const opt = document.createElement("option");
+      opt.value = p;
+      opt.textContent = p;
+      selectVotante.appendChild(opt);
+    });
+
+    // 2. Renderiza a lista de cards
+    function renderizarJogadores() {
+      const container = document.getElementById("lista-jogadores");
+      container.innerHTML = PLAYERS.map(p => `
+        <div class="player-card">
+          <span class="player-name">${p}</span>
+          <div class="tier-buttons">
+            ${[1, 2, 3, 4, 5].map(t => `
+              <button class="btn-tier" data-p="${p}" data-t="${t}" onclick="selecionar('${p}', ${t})">${t}</button>
+            `).join("")}
+          </div>
+        </div>
+      `).join("");
+    }
+
+    // 3. Atualiza seleção visual e memória
+    function selecionar(player, tier) {
+      votos[player] = tier;
+      document.querySelectorAll(`button[data-p="${player}"]`).forEach(btn => {
+        btn.classList.toggle("active", parseInt(btn.dataset.t) === tier);
+      });
+      atualizarProgresso();
+    }
+
+    function atualizarProgresso() {
+      const totalPreenchido = Object.keys(votos).length;
+      document.getElementById("progresso").innerText = `Classificados: ${totalPreenchido} / ${PLAYERS.length}`;
+    }
+
+    // 4. Envio dos dados via Google Forms para alimentar o Google Sheets
+    async function enviarVotos() {
+      const votante = selectVotante.value;
+      if (!votante) {
+        alert("Selecione o seu nick na lista antes de enviar!");
+        selectVotante.focus();
+        return;
+      }
+
+      const totalPreenchido = Object.keys(votos).length;
+      if (totalPreenchido < PLAYERS.length) {
+        alert(`Ainda faltam jogadores para classificar! (${totalPreenchido}/${PLAYERS.length})`);
+        return;
+      }
+
+      const btn = document.getElementById("btnSalvar");
+      btn.disabled = true;
+      btn.innerText = "Gravando na folha...";
+
+      // Substitua com a URL formResponse do seu Forms:
+      const FORM_URL = "https://docs.google.com/forms/d/e/COLOQUE_SEU_ID_AQUI/formResponse";
+
+      const formData = new FormData();
+      // Substitua pelos identificadores entry.XXXXX correspondentes do seu Google Forms:
+      formData.append("entry.VOTANTE_ID", votante);
+      formData.append("entry.TIER1_ID", PLAYERS.filter(p => votos[p] === 1).join(", "));
+      formData.append("entry.TIER2_ID", PLAYERS.filter(p => votos[p] === 2).join(", "));
+      formData.append("entry.TIER3_ID", PLAYERS.filter(p => votos[p] === 3).join(", "));
+      formData.append("entry.TIER4_ID", PLAYERS.filter(p => votos[p] === 4).join(", "));
+      formData.append("entry.TIER5_ID", PLAYERS.filter(p => votos[p] === 5).join(", "));
+
+      try {
+        await fetch(FORM_URL, {
+          method: "POST",
+          mode: "no-cors",
+          body: formData
+        });
+
+        alert(`✅ Votação de ${votante} enviada com sucesso!`);
+        btn.innerText = "Votos Gravados!";
+      } catch (err) {
+        alert("Erro na conexão. Copie os dados e envie na DM do WhatsApp.");
+        prompt("Copie este texto:", JSON.stringify({ votante, votos }));
+        btn.disabled = false;
+        btn.innerText = "TENTAR NOVAMENTE";
+      }
+    }
+
+    renderizarJogadores();
+  </script>
+</body>
+</html>
