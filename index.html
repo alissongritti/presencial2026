@@ -34,7 +34,6 @@
       transition: all 0.15s ease;
     }
     
-    /* Cores dos Tiers idênticas ao modelo */
     .btn-tier.active[data-t="1"] { background: #ffd700; color: #000; border-color: #ffd700; }
     .btn-tier.active[data-t="2"] { background: #ff7b00; color: #000; border-color: #ff7b00; }
     .btn-tier.active[data-t="3"] { background: #04d361; color: #000; border-color: #04d361; }
@@ -68,7 +67,6 @@
   </div>
 
   <script>
-    // 30 Nicks organizados a partir da grelha oficial
     const PLAYERS = [
       "EKZ", "Leodemetrio", "high", "Comar", "Meztre", "Vitão",
       "Drox", "Português", "Eufrasin", "norT", "PvL", "Saitama",
@@ -79,7 +77,6 @@
 
     const votos = {};
 
-    // 1. Preenche o select do votante
     const selectVotante = document.getElementById("select-votante");
     PLAYERS.forEach(p => {
       const opt = document.createElement("option");
@@ -88,7 +85,6 @@
       selectVotante.appendChild(opt);
     });
 
-    // 2. Renderiza a lista de cards
     function renderizarJogadores() {
       const container = document.getElementById("lista-jogadores");
       container.innerHTML = PLAYERS.map(p => `
@@ -103,7 +99,6 @@
       `).join("");
     }
 
-    // 3. Atualiza seleção visual e memória
     function selecionar(player, tier) {
       votos[player] = tier;
       document.querySelectorAll(`button[data-p="${player}"]`).forEach(btn => {
@@ -117,7 +112,6 @@
       document.getElementById("progresso").innerText = `Classificados: ${totalPreenchido} / ${PLAYERS.length}`;
     }
 
-    // 4. Envio dos dados via Google Forms para alimentar o Google Sheets
     async function enviarVotos() {
       const votante = selectVotante.value;
       if (!votante) {
@@ -134,19 +128,17 @@
 
       const btn = document.getElementById("btnSalvar");
       btn.disabled = true;
-      btn.innerText = "Gravando na folha...";
+      btn.innerText = "Gravando na planilha...";
 
-      // Substitua com a URL formResponse do seu Forms:
-      const FORM_URL = "https://docs.google.com/forms/d/e/COLOQUE_SEU_ID_AQUI/formResponse";
+      const FORM_URL = "https://docs.google.com/forms/d/e/1FAIpQLSdWq05O0DawoOmPSA9i934ZbgRemVGi-VgoIm0sY4qhNn_w3A/formResponse";
 
       const formData = new FormData();
-      // Substitua pelos identificadores entry.XXXXX correspondentes do seu Google Forms:
-      formData.append("entry.VOTANTE_ID", votante);
-      formData.append("entry.TIER1_ID", PLAYERS.filter(p => votos[p] === 1).join(", "));
-      formData.append("entry.TIER2_ID", PLAYERS.filter(p => votos[p] === 2).join(", "));
-      formData.append("entry.TIER3_ID", PLAYERS.filter(p => votos[p] === 3).join(", "));
-      formData.append("entry.TIER4_ID", PLAYERS.filter(p => votos[p] === 4).join(", "));
-      formData.append("entry.TIER5_ID", PLAYERS.filter(p => votos[p] === 5).join(", "));
+      formData.append("entry.1596499606", votante);
+      formData.append("entry.1187693059", PLAYERS.filter(p => votos[p] === 1).join(", "));
+      formData.append("entry.835340216", PLAYERS.filter(p => votos[p] === 2).join(", "));
+      formData.append("entry.1898716609", PLAYERS.filter(p => votos[p] === 3).join(", "));
+      formData.append("entry.869721830", PLAYERS.filter(p => votos[p] === 4).join(", "));
+      formData.append("entry.1189178927", PLAYERS.filter(p => votos[p] === 5).join(", "));
 
       try {
         await fetch(FORM_URL, {
@@ -156,9 +148,9 @@
         });
 
         alert(`✅ Votação de ${votante} enviada com sucesso!`);
-        btn.innerText = "Votos Gravados!";
+        btn.innerText = "Votos Gravados com Sucesso!";
       } catch (err) {
-        alert("Erro na conexão. Copie os dados e envie na DM do WhatsApp.");
+        alert("Erro na conexão. Copie os dados e envie no WhatsApp.");
         prompt("Copie este texto:", JSON.stringify({ votante, votos }));
         btn.disabled = false;
         btn.innerText = "TENTAR NOVAMENTE";
